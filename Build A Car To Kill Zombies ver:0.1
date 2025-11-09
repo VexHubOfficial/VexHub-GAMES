@@ -1,23 +1,39 @@
--- By Vex Hub Dev & Creator
--- Game: Build A Car To Kill Zombies
+-- Vex Hub - Build A Car to Kill Zombies
+-- v0.2
+-- Changelog
+-- Checkpoints 4-6
 local Players = game:GetService("Players")
 local UserInputService = game:GetService("UserInputService")
 local RunService = game:GetService("RunService")
 local player = Players.LocalPlayer
 
--- Coordinates
+-- All checkpoints including Start (for reference if needed)
 local checkpoints = {
-    {name = "CP 1", position = Vector3.new(-20, 417, -1225)},
-    {name = "CP 2", position = Vector3.new(-1020, 418, -1220)},
-    {name = "CP 3", position = Vector3.new(-2120, 416, -2148)}
+    {name = "Start", position = Vector3.new(-66, 412, -45)},
+    {name = "Checkpoint 1", position = Vector3.new(-20, 417, -1225)},
+    {name = "Checkpoint 2", position = Vector3.new(-1020, 418, -1220)},
+    {name = "Checkpoint 3", position = Vector3.new(-2120, 416, -2148)},
+    {name = "Checkpoint 4", position = Vector3.new(-540, 420, -3364)},
+    {name = "Checkpoint 5", position = Vector3.new(-310, 420, -5790)},
+    {name = "Checkpoint 6", position = Vector3.new(-310, 420, -7350)}
+}
+
+-- Only Checkpoints 1–6 for the teleport sections
+local checkpointsOnly = {
+    {name = "Checkpoint 1", position = Vector3.new(-20, 417, -1225)},
+    {name = "Checkpoint 2", position = Vector3.new(-1020, 418, -1220)},
+    {name = "Checkpoint 3", position = Vector3.new(-2120, 416, -2148)},
+    {name = "Checkpoint 4", position = Vector3.new(-540, 420, -3364)},
+    {name = "Checkpoint 5", position = Vector3.new(-310, 420, -5790)},
+    {name = "Checkpoint 6", position = Vector3.new(-310, 420, -7350)}
 }
 
 -- GUI settings
 local guiWidth = 400
-local guiHeight = 380 -- extra height for misc toggle and safe height input
+local guiHeight = 380
 local buttonHeight = 40
 local fontSize = 16
-local themeColor = Color3.fromRGB(128,0,128)
+local themeColor = Color3.fromRGB(128, 0, 128)
 
 -- Remember last selected tab
 local lastTab = "Home"
@@ -107,13 +123,13 @@ local function createGUI()
 
     -- Toggle button
     local toggleRect = Instance.new("TextButton")
-    toggleRect.Size = UDim2.new(0,120,0,30)
-    toggleRect.Position = UDim2.new(0,20,0,100)
+    toggleRect.Size = UDim2.new(0, 120, 0, 30)
+    toggleRect.Position = UDim2.new(0, 20, 0, 100)
     toggleRect.BackgroundColor3 = themeColor
     toggleRect.BorderSizePixel = 0
     toggleRect.Text = "Car Game"
     toggleRect.Font = Enum.Font.SourceSansBold
-    toggleRect.TextColor3 = Color3.fromRGB(255,255,255)
+    toggleRect.TextColor3 = Color3.fromRGB(255, 255, 255)
     toggleRect.TextSize = fontSize
     toggleRect.Parent = screenGui
 
@@ -121,82 +137,82 @@ local function createGUI()
     local mainFrame = Instance.new("Frame")
     mainFrame.Size = UDim2.new(0, guiWidth, 0, guiHeight)
     mainFrame.Position = UDim2.new(0.5, -guiWidth/2, 0.5, -guiHeight/2)
-    mainFrame.BackgroundColor3 = themeColor:lerp(Color3.fromRGB(60,0,60),0.3)
+    mainFrame.BackgroundColor3 = themeColor:lerp(Color3.fromRGB(60, 0, 60), 0.3)
     mainFrame.BorderSizePixel = 0
     mainFrame.Visible = false
     mainFrame.Parent = screenGui
 
     -- Header
     local header = Instance.new("TextLabel")
-    header.Size = UDim2.new(1,0,0,30)
-    header.Position = UDim2.new(0,0,0,0)
+    header.Size = UDim2.new(1, 0, 0, 30)
+    header.Position = UDim2.new(0, 0, 0, 0)
     header.BackgroundColor3 = themeColor
     header.BorderSizePixel = 0
     header.Text = "Vex Hub - Car Game"
     header.Font = Enum.Font.SourceSansBold
-    header.TextColor3 = Color3.fromRGB(255,255,255)
+    header.TextColor3 = Color3.fromRGB(255, 255, 255)
     header.TextSize = fontSize
     header.Parent = mainFrame
 
     -- Tabs
     local tabColumn = Instance.new("Frame")
-    tabColumn.Size = UDim2.new(0,100,1,-30)
-    tabColumn.Position = UDim2.new(0,0,0,30)
-    tabColumn.BackgroundColor3 = themeColor:lerp(Color3.fromRGB(50,0,50),0.4)
+    tabColumn.Size = UDim2.new(0, 100, 1, -30)
+    tabColumn.Position = UDim2.new(0, 0, 0, 30)
+    tabColumn.BackgroundColor3 = themeColor:lerp(Color3.fromRGB(50, 0, 50), 0.4)
     tabColumn.BorderSizePixel = 0
     tabColumn.Parent = mainFrame
 
     local contentFrame = Instance.new("Frame")
-    contentFrame.Size = UDim2.new(1,-100,1,-30)
-    contentFrame.Position = UDim2.new(0,100,0,30)
-    contentFrame.BackgroundColor3 = themeColor:lerp(Color3.fromRGB(70,0,70),0.5)
+    contentFrame.Size = UDim2.new(1, -100, 1, -30)
+    contentFrame.Position = UDim2.new(0, 100, 0, 30)
+    contentFrame.BackgroundColor3 = themeColor:lerp(Color3.fromRGB(70, 0, 70), 0.5)
     contentFrame.BorderSizePixel = 0
     contentFrame.Parent = mainFrame
 
     -- Tab buttons
     local function createTabButton(name, yPos)
         local btn = Instance.new("TextButton")
-        btn.Size = UDim2.new(1,0,0,buttonHeight)
-        btn.Position = UDim2.new(0,0,0,yPos)
-        btn.BackgroundColor3 = themeColor:lerp(Color3.fromRGB(90,0,90),0.4)
+        btn.Size = UDim2.new(1, 0, 0, buttonHeight)
+        btn.Position = UDim2.new(0, 0, 0, yPos)
+        btn.BackgroundColor3 = themeColor:lerp(Color3.fromRGB(90, 0, 90), 0.4)
         btn.BorderSizePixel = 0
         btn.Text = name
         btn.Font = Enum.Font.SourceSansBold
-        btn.TextColor3 = Color3.fromRGB(255,255,255)
+        btn.TextColor3 = Color3.fromRGB(255, 255, 255)
         btn.TextSize = fontSize
         btn.Parent = tabColumn
         return btn
     end
 
-    local homeTabBtn = createTabButton("Home",0)
-    local teleportsTabBtn = createTabButton("Teleports",buttonHeight)
-    local miscTabBtn = createTabButton("Misc",buttonHeight*2)
+    local homeTabBtn = createTabButton("Home", 0)
+    local teleportsTabBtn = createTabButton("Teleports", buttonHeight)
+    local miscTabBtn = createTabButton("Misc", buttonHeight * 2)
 
     -- Home content
     local homeContent = Instance.new("Frame")
-    homeContent.Size = UDim2.new(1,0,1,0)
+    homeContent.Size = UDim2.new(1, 0, 1, 0)
     homeContent.BackgroundTransparency = 1
     homeContent.Parent = contentFrame
 
     local welcomeText = Instance.new("TextLabel")
-    welcomeText.Size = UDim2.new(1,-20,0,50)
-    welcomeText.Position = UDim2.new(0,10,0,10)
+    welcomeText.Size = UDim2.new(1, -20, 0, 50)
+    welcomeText.Position = UDim2.new(0, 10, 0, 10)
     welcomeText.BackgroundTransparency = 1
     welcomeText.Text = "Welcome to Vex Hub!\nJoin our Discord here:"
     welcomeText.Font = Enum.Font.SourceSansBold
-    welcomeText.TextColor3 = Color3.fromRGB(255,255,255)
+    welcomeText.TextColor3 = Color3.fromRGB(255, 255, 255)
     welcomeText.TextSize = fontSize
     welcomeText.TextWrapped = true
     welcomeText.TextXAlignment = Enum.TextXAlignment.Left
     welcomeText.Parent = homeContent
 
     local discordButton = Instance.new("TextButton")
-    discordButton.Size = UDim2.new(0,100,0,buttonHeight)
-    discordButton.Position = UDim2.new(0,10,0,70)
-    discordButton.BackgroundColor3 = themeColor:lerp(Color3.fromRGB(100,0,100),0.5)
+    discordButton.Size = UDim2.new(0, 100, 0, buttonHeight)
+    discordButton.Position = UDim2.new(0, 10, 0, 70)
+    discordButton.BackgroundColor3 = themeColor:lerp(Color3.fromRGB(100, 0, 100), 0.5)
     discordButton.Text = "Discord"
     discordButton.Font = Enum.Font.SourceSansBold
-    discordButton.TextColor3 = Color3.fromRGB(255,255,255)
+    discordButton.TextColor3 = Color3.fromRGB(255, 255, 255)
     discordButton.TextSize = fontSize
     discordButton.Parent = homeContent
     discordButton.MouseButton1Click:Connect(function()
@@ -205,77 +221,84 @@ local function createGUI()
 
     -- Teleports content
     local teleportsContent = Instance.new("Frame")
-    teleportsContent.Size = UDim2.new(1,0,1,0)
+    teleportsContent.Size = UDim2.new(1, 0, 1, 0)
     teleportsContent.BackgroundTransparency = 1
     teleportsContent.Visible = false
     teleportsContent.Parent = contentFrame
 
-    local function createTeleportSection(title,yPos,cpList,loop)
+    -- Scrollable teleport section function
+    local function createTeleportSection(title, yPos, cpList, loop)
         local sectionLabel = Instance.new("TextLabel")
-        sectionLabel.Size = UDim2.new(1,-20,0,25)
-        sectionLabel.Position = UDim2.new(0,10,0,yPos)
+        sectionLabel.Size = UDim2.new(1, -20, 0, 25)
+        sectionLabel.Position = UDim2.new(0, 10, 0, yPos)
         sectionLabel.BackgroundTransparency = 1
         sectionLabel.Text = title
         sectionLabel.Font = Enum.Font.SourceSansBold
-        sectionLabel.TextColor3 = Color3.fromRGB(255,255,255)
+        sectionLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
         sectionLabel.TextSize = fontSize
         sectionLabel.TextXAlignment = Enum.TextXAlignment.Left
         sectionLabel.Parent = teleportsContent
 
-        local xOffset = 10
-        local yOffset = yPos + 30
+        local scrollFrame = Instance.new("ScrollingFrame")
+        scrollFrame.Size = UDim2.new(1, -20, 0, buttonHeight + 10)
+        scrollFrame.Position = UDim2.new(0, 10, 0, yPos + 30)
+        scrollFrame.CanvasSize = UDim2.new(0, #cpList * 100, 0, buttonHeight)
+        scrollFrame.ScrollBarThickness = 6
+        scrollFrame.HorizontalScrollBarInset = Enum.ScrollBarInset.Always
+        scrollFrame.BackgroundTransparency = 1
+        scrollFrame.Parent = teleportsContent
+
+        local xOffset = 0
         for i, cp in ipairs(cpList) do
             local btn = Instance.new("TextButton")
-            btn.Size = UDim2.new(0,90,0,buttonHeight)
-            btn.Position = UDim2.new(0,xOffset,0,yOffset)
-            btn.BackgroundColor3 = themeColor:lerp(Color3.fromRGB(100,0,100),0.6)
+            btn.Size = UDim2.new(0, 90, 0, buttonHeight)
+            btn.Position = UDim2.new(0, xOffset, 0, 0)
+            btn.BackgroundColor3 = themeColor:lerp(Color3.fromRGB(100, 0, 100), 0.6)
             btn.Text = cp.name
             btn.Font = Enum.Font.SourceSansBold
-            btn.TextColor3 = Color3.fromRGB(255,255,255)
+            btn.TextColor3 = Color3.fromRGB(255, 255, 255)
             btn.TextSize = fontSize
-            btn.Parent = teleportsContent
+            btn.Parent = scrollFrame
 
             btn.MouseButton1Click:Connect(function()
                 teleportTo(cp.position, loop)
             end)
 
             xOffset = xOffset + 100
-            if xOffset + 90 > teleportsContent.AbsoluteSize.X then
-                xOffset = 10
-                yOffset = yOffset + buttonHeight + 5
-            end
         end
-        return yOffset + buttonHeight + 10
+
+        return yPos + buttonHeight + 50
     end
 
+    -- Use only Checkpoints 1–6 for teleport sections
     local nextY = 10
-    nextY = createTeleportSection("Checkpoint Loop TP",nextY,checkpoints,true)
-    nextY = createTeleportSection("Checkpoint TP",nextY,checkpoints,false)
+    nextY = createTeleportSection("Checkpoint Loop TP", nextY, checkpointsOnly, true)
+    nextY = createTeleportSection("Checkpoint TP", nextY, checkpointsOnly, false)
 
     -- Misc content
     local miscContent = Instance.new("Frame")
-    miscContent.Size = UDim2.new(1,0,1,0)
+    miscContent.Size = UDim2.new(1, 0, 1, 0)
     miscContent.BackgroundTransparency = 1
     miscContent.Visible = false
     miscContent.Parent = contentFrame
 
     -- Anti Void toggle
     local antiVoidButton = Instance.new("TextButton")
-    antiVoidButton.Size = UDim2.new(0,150,0,30)
-    antiVoidButton.Position = UDim2.new(0,10,0,10)
-    antiVoidButton.BackgroundColor3 = themeColor:lerp(Color3.fromRGB(100,0,100),0.5)
+    antiVoidButton.Size = UDim2.new(0, 150, 0, 30)
+    antiVoidButton.Position = UDim2.new(0, 10, 0, 10)
+    antiVoidButton.BackgroundColor3 = themeColor:lerp(Color3.fromRGB(100, 0, 100), 0.5)
     antiVoidButton.Font = Enum.Font.SourceSansBold
-    antiVoidButton.TextColor3 = Color3.fromRGB(255,255,255)
+    antiVoidButton.TextColor3 = Color3.fromRGB(255, 255, 255)
     antiVoidButton.TextSize = fontSize
     antiVoidButton.Text = "Anti Void [X]"
     antiVoidButton.Parent = miscContent
 
     -- Safe height input
     local safeHeightInput = Instance.new("TextBox")
-    safeHeightInput.Size = UDim2.new(0,80,0,30)
-    safeHeightInput.Position = UDim2.new(0,10,0,50)
-    safeHeightInput.BackgroundColor3 = themeColor:lerp(Color3.fromRGB(90,0,90),0.5)
-    safeHeightInput.TextColor3 = Color3.fromRGB(255,255,255)
+    safeHeightInput.Size = UDim2.new(0, 80, 0, 30)
+    safeHeightInput.Position = UDim2.new(0, 10, 0, 50)
+    safeHeightInput.BackgroundColor3 = themeColor:lerp(Color3.fromRGB(90, 0, 90), 0.5)
+    safeHeightInput.TextColor3 = Color3.fromRGB(255, 255, 255)
     safeHeightInput.Font = Enum.Font.SourceSans
     safeHeightInput.TextSize = fontSize
     safeHeightInput.Text = tostring(antiVoidHeight)
@@ -291,7 +314,6 @@ local function createGUI()
         end
     end)
 
-    -- Anti Void toggle functionality
     antiVoidButton.MouseButton1Click:Connect(function()
         antiVoidEnabled = not antiVoidEnabled
         if antiVoidEnabled then
