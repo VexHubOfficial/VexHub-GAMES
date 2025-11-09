@@ -1,0 +1,179 @@
+-- Vex Hub - Color or Die
+-- By Vex Dev & Creator
+local TweenService = game:GetService("TweenService")
+local Player = game.Players.LocalPlayer
+
+local Character = Player.Character or Player.CharacterAdded:Wait()
+local Root = Character:WaitForChild("HumanoidRootPart")
+
+--// GUI Setup
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Name = "VexHubGridAll"
+ScreenGui.ResetOnSpawn = false
+ScreenGui.Parent = Player:WaitForChild("PlayerGui")
+
+--// Toggle Button
+local ToggleButton = Instance.new("TextButton")
+ToggleButton.Size = UDim2.new(0,100,0,35)
+ToggleButton.Position = UDim2.new(1,-110,0,10)
+ToggleButton.BackgroundColor3 = Color3.fromRGB(0,0,0)
+ToggleButton.BackgroundTransparency = 0.2
+ToggleButton.TextColor3 = Color3.fromRGB(255,255,255)
+ToggleButton.Font = Enum.Font.GothamBold
+ToggleButton.TextSize = 16
+ToggleButton.Text = "▼ Teleport"
+ToggleButton.Parent = ScreenGui
+
+--// Panel
+local Panel = Instance.new("Frame")
+Panel.Size = UDim2.new(0,400,0,0)
+Panel.Position = UDim2.new(0.5,-200,0,-10) -- 10 px up
+Panel.BackgroundColor3 = Color3.fromRGB(0,0,0)
+Panel.BackgroundTransparency = 0.15
+Panel.ClipsDescendants = true
+Panel.Parent = ScreenGui
+
+Instance.new("UICorner", Panel).CornerRadius = UDim.new(0,10)
+Instance.new("UIStroke", Panel).Color = Color3.fromRGB(255,255,255)
+
+--// Header
+local Header = Instance.new("TextLabel")
+Header.Size = UDim2.new(1,0,0,40)
+Header.Position = UDim2.new(0,0,0,0)
+Header.BackgroundTransparency = 1
+Header.Text = "Vex Hub - Color or Die"
+Header.TextColor3 = Color3.fromRGB(255,255,255)
+Header.Font = Enum.Font.GothamBold
+Header.TextSize = 22
+Header.Parent = Panel
+
+--// Scrollable Frame
+local ScrollFrame = Instance.new("ScrollingFrame")
+ScrollFrame.Size = UDim2.new(1,0,1,-40)
+ScrollFrame.Position = UDim2.new(0,0,0,40)
+ScrollFrame.CanvasSize = UDim2.new(0,0,0,0)
+ScrollFrame.ScrollBarThickness = 6
+ScrollFrame.BackgroundTransparency = 1
+ScrollFrame.Parent = Panel
+
+-- Layout: Grid
+local GridLayout = Instance.new("UIGridLayout")
+GridLayout.CellSize = UDim2.new(0.5,-12,0,40)
+GridLayout.CellPadding = UDim2.new(0,6,0,6)
+GridLayout.SortOrder = Enum.SortOrder.LayoutOrder
+GridLayout.Parent = ScrollFrame
+
+--// Color Definitions
+local ColorMap = {
+	Start = Color3.fromRGB(255,0,0),
+	Red = Color3.fromRGB(255,0,0),
+	Vent = Color3.fromRGB(128,128,128),
+	["Orange Bucket"] = Color3.fromRGB(255,128,0),
+	Orange = Color3.fromRGB(255,128,0),
+	Yellow = Color3.fromRGB(255,255,0),
+	["Green Bucket"] = Color3.fromRGB(0,255,0),
+	Green = Color3.fromRGB(0,255,0),
+	Cyan = Color3.fromRGB(0,255,255),
+	Triangle = Color3.fromRGB(0,255,255),
+	Blue = Color3.fromRGB(0,0,255),
+	Saw = Color3.fromRGB(0,0,255),
+	["Purple Bucket"] = Color3.fromRGB(170,0,255),
+	Purple = Color3.fromRGB(170,0,255),
+	["Plank Place"] = Color3.fromRGB(139,69,19),
+	["Hammer Use"] = Color3.fromRGB(255,0,255),
+	Pink = Color3.fromRGB(255,0,255),
+	["Key Use"] = Color3.fromRGB(0,255,0),
+	Exit = Color3.fromRGB(255,255,0),
+	["White Bucket"] = Color3.fromRGB(255,255,255),
+	White = Color3.fromRGB(255,255,255),
+	Escape = Color3.fromRGB(255,0,0),
+}
+
+--// Teleports in order
+local Colors = {
+	{"Start",-22,3,0},
+	{"Red",215,3,30},
+	{"Vent",130,3,53},
+	{"Orange Bucket",820,70,-622},
+	{"Orange",275,3,42},
+	{"Yellow",205,3,-55},
+	{"Green Bucket",718,150,375},
+	{"Green",324,3,90},
+	{"Cyan",855,70,-555},
+	{"Triangle",324,3,87},
+	{"Blue",288,3,-123},
+	{"Saw",190,3,-55},
+	{"Purple Bucket",852,42,73},
+	{"Purple",216,3,-150},
+	{"Plank Place",245,28,-65},
+	{"Hammer Use",229,3,17},
+	{"Pink",348,3,5},
+	{"Key Use",708,150,327},
+	{"Exit",415,3,25},
+	{"White Bucket",-166,-63,-364},
+	{"White",-20,3,20},
+	{"Escape",-50,3,0},
+}
+
+local Brushes = {
+	{"1",107,3,-6},{"2",108,3,-55},{"3",821,70,-617},{"4",864,70,-590},
+	{"5",720,150,365},{"6",706,150,302},{"7",310,30,-125},{"8",364,3,102},
+	{"9",216,3,74},{"10",176,3,-131},{"11",852,42,-70},{"12",196,28,-114},
+	{"13",107,3,76}
+}
+
+-- Determine max rows
+local totalRows = math.max(#Colors,#Brushes)
+
+--// Create paired buttons
+for i=1,totalRows do
+	-- Color button
+	if Colors[i] then
+		local name,x,y,z = unpack(Colors[i])
+		local btn = Instance.new("TextButton")
+		btn.Size = UDim2.new(1,0,0,40)
+		btn.BackgroundColor3 = ColorMap[name] or Color3.fromRGB(255,255,255)
+		btn.Text = name
+		btn.TextColor3 = Color3.fromRGB(0,0,0)
+		btn.Font = Enum.Font.GothamBold
+		btn.TextSize = 14
+		btn.Parent = ScrollFrame
+		Instance.new("UICorner", btn).CornerRadius = UDim.new(0,6)
+		btn.MouseButton1Click:Connect(function()
+			if Root then
+				Root.CFrame = CFrame.new(Vector3.new(x,y,z)+Vector3.new(0,3,0))
+			end
+		end)
+	end
+
+	-- Brush button
+	if Brushes[i] then
+		local name,x,y,z = unpack(Brushes[i])
+		local btn = Instance.new("TextButton")
+		btn.Size = UDim2.new(1,0,0,40)
+		btn.BackgroundColor3 = Color3.fromRGB(255,255,255)
+		btn.Text = name
+		btn.TextColor3 = Color3.fromRGB(0,0,0)
+		btn.Font = Enum.Font.GothamBold
+		btn.TextSize = 14
+		btn.Parent = ScrollFrame
+		Instance.new("UICorner", btn).CornerRadius = UDim.new(0,6)
+		btn.MouseButton1Click:Connect(function()
+			if Root then
+				Root.CFrame = CFrame.new(Vector3.new(x,y,z)+Vector3.new(0,3,0))
+			end
+		end)
+	end
+end
+
+ScrollFrame.CanvasSize = UDim2.new(0,0,totalRows*46,0)
+
+--// Dropdown Animation
+local open = false
+ToggleButton.MouseButton1Click:Connect(function()
+	open = not open
+	ToggleButton.Text = open and "▲ Close" or "▼ Teleport"
+	local goalSize = open and UDim2.new(0,400,0,420) or UDim2.new(0,400,0,0)
+	local tween = TweenService:Create(Panel,TweenInfo.new(0.4,Enum.EasingStyle.Quad,Enum.EasingDirection.Out),{Size = goalSize})
+	tween:Play()
+end)
