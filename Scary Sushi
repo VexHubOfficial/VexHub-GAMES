@@ -1,9 +1,7 @@
 -- Vex Hub - Scary Sushi
--- By Vex Hub Dev & Creatir
-
+-- By Vex Hub Dev & Creator
 local Players = game:GetService("Players")
 local TweenService = game:GetService("TweenService")
-local RunService = game:GetService("RunService")
 local player = Players.LocalPlayer
 
 -- Teleport locations
@@ -34,43 +32,22 @@ toggleButton.TextSize = 18
 toggleButton.Text = "☰"
 toggleButton.Parent = screenGui
 
--- Glow Frame (behind main GUI)
-local glowFrame = Instance.new("Frame")
-glowFrame.Size = UDim2.new(0, 440, 0, 340) -- slightly bigger than main
-glowFrame.Position = UDim2.new(0.5, 0, -0.5, 0) -- start offscreen top
-glowFrame.AnchorPoint = Vector2.new(0.5, 0.5)
-glowFrame.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-glowFrame.BackgroundTransparency = 0.9
-glowFrame.BorderSizePixel = 0
-glowFrame.Parent = screenGui
-
-local glowStroke = Instance.new("UIStroke")
-glowStroke.Color = Color3.fromRGB(255, 255, 255)
-glowStroke.Thickness = 6
-glowStroke.Parent = glowFrame
-
 -- Main Frame (centered)
 local mainFrame = Instance.new("Frame")
 mainFrame.Size = UDim2.new(0, 400, 0, 300)
-mainFrame.Position = UDim2.new(0.5, 0, -0.5, 0) -- start offscreen top
+mainFrame.Position = UDim2.new(0.5, 0, 0.5, 0) -- start at center but offset for tween
 mainFrame.AnchorPoint = Vector2.new(0.5, 0.5)
 mainFrame.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
 mainFrame.BorderColor3 = Color3.fromRGB(255, 255, 255)
 mainFrame.BorderSizePixel = 2
 mainFrame.Parent = screenGui
 
--- Neon Glow (UIStroke)
+-- Add Neon Glow (UIStroke)
 local neonStroke = Instance.new("UIStroke")
 neonStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
 neonStroke.Color = Color3.fromRGB(255, 255, 255)
 neonStroke.Thickness = 3
 neonStroke.Parent = mainFrame
-
--- Pulse variables
-local pulseDirection = 1
-local pulseSpeed = 2
-local pulseMin = 0.7
-local pulseMax = 1
 
 -- Title
 local title = Instance.new("TextLabel")
@@ -82,7 +59,7 @@ title.Font = Enum.Font.SourceSansBold
 title.TextSize = 20
 title.Parent = mainFrame
 
--- Content Frame
+-- Content Frame (for buttons)
 local contentFrame = Instance.new("Frame")
 contentFrame.Size = UDim2.new(1, -20, 1, -50)
 contentFrame.Position = UDim2.new(0, 10, 0, 50)
@@ -133,7 +110,8 @@ for _, teleport in ipairs(teleportLocations) do
     end)
 end
 
--- Hide GUI initially
+-- Hide GUI offscreen initially
+mainFrame.Position = UDim2.new(0.5, 0, -0.5, 0) -- above screen
 local visible = false
 local tweenInfo = TweenInfo.new(0.5, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
 
@@ -146,25 +124,6 @@ toggleButton.MouseButton1Click:Connect(function()
     else
         targetPos = UDim2.new(0.5, 0, -0.5, 0) -- offscreen top
     end
-    local tweenMain = TweenService:Create(mainFrame, tweenInfo, {Position = targetPos})
-    local tweenGlow = TweenService:Create(glowFrame, tweenInfo, {Position = targetPos})
-    tweenMain:Play()
-    tweenGlow:Play()
-end)
-
--- Neon pulse effect
-RunService.RenderStepped:Connect(function(dt)
-    -- Main frame pulse
-    local scale = neonStroke.Thickness / 3
-    if pulseDirection == 1 then
-        scale = scale + dt * pulseSpeed
-        if scale >= pulseMax then pulseDirection = -1 end
-    else
-        scale = scale - dt * pulseSpeed
-        if scale <= pulseMin then pulseDirection = 1 end
-    end
-    neonStroke.Thickness = 3 * scale
-
-    -- Glow pulse synced
-    glowStroke.Thickness = 6 * scale
+    local tween = TweenService:Create(mainFrame, tweenInfo, {Position = targetPos})
+    tween:Play()
 end)
